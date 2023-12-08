@@ -1,0 +1,29 @@
+name: Deploy Surge
+
+on:
+  workflow_dispatch:
+    branches:
+      - main
+
+concurrency:
+  cancel-in-progress: true
+
+jobs:
+  buildNdeploy:
+    environment: production
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./
+    steps:
+      - name: Fetch Code
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Deploy Surge
+        run: |
+          npm install -g surge
+          surge ./dist --domain ${{ secrets.SURGE_DOMAIN }} --token ${{ secrets.SURGE_TOKEN }}
